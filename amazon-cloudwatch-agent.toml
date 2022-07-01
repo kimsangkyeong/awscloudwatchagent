@@ -1,0 +1,51 @@
+[agent]
+  collection_jitter = "0s"
+  debug = false
+  flush_interval = "1s"
+  flush_jitter = "0s"
+  hostname = ""
+  interval = "60s"
+  logfile = "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log"
+  logtarget = "lumberjack"
+  metric_batch_size = 1000
+  metric_buffer_limit = 10000
+  omit_hostname = false
+  precision = ""
+  quiet = false
+  round_interval = false
+
+[inputs]
+
+  [[inputs.logfile]]
+    destination = "cloudwatchlogs"
+    file_state_folder = "/opt/aws/amazon-cloudwatch-agent/logs/state"
+
+    [[inputs.logfile.file_config]]
+      file_path = "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log"
+      from_beginning = true
+      log_group_name = "/apps/CloudWatchAgentLog/"
+      log_stream_name = "replace_file_logstream_1"
+      pipe = false
+      retention_in_days = -1
+      timezone = "LOCAL"
+
+    [[inputs.logfile.file_config]]
+      file_path = "replace_app_logfile_1"
+      from_beginning = true
+      log_group_name = "/apps/cwlogstest/"
+      log_stream_name = "replace_file_logstream_1"
+      pipe = false
+      retention_in_days = 30
+      timezone = "LOCAL"
+    [inputs.logfile.tags]
+      metricPath = "logs"
+
+[outputs]
+
+  [[outputs.cloudwatchlogs]]
+    force_flush_interval = "5s"
+    log_stream_name = "cwagent-container"
+    region = "replace_region"
+    tagexclude = ["metricPath"]
+    [outputs.cloudwatchlogs.tagpass]
+      metricPath = ["logs"]
